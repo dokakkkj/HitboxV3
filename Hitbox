@@ -1,0 +1,86 @@
+local TweenService = game:GetService("TweenService")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false -- Mantém a GUI após a morte do personagem
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 205, 0, 135) -- Aumentado para acomodar mais botões
+Frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+
+-- Variáveis para controle de hitbox e tamanho
+local HeadSize = 20
+local HitboxTransparency = 0.9 -- Transparência inicial
+
+-- Botão para aumentar o tamanho
+local increaseSizeButton = Instance.new("TextButton")
+increaseSizeButton.Size = UDim2.new(0, 150, 0, 35)
+increaseSizeButton.Position = UDim2.new(0.5, -100, 0, 10)
+increaseSizeButton.Text = "Aumentar Tamanho"
+increaseSizeButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+increaseSizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+increaseSizeButton.Parent = Frame
+
+-- Botão para diminuir o tamanho
+local decreaseSizeButton = Instance.new("TextButton")
+decreaseSizeButton.Size = UDim2.new(0, 150, 0, 35)
+decreaseSizeButton.Position = UDim2.new(0.5, -100, 0, 50)
+decreaseSizeButton.Text = "Diminuir Tamanho"
+decreaseSizeButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+decreaseSizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+decreaseSizeButton.Parent = Frame
+
+-- Botão para ajustar a transparência
+local toggleTransparencyButton = Instance.new("TextButton")
+toggleTransparencyButton.Size = UDim2.new(0, 150, 0, 35)
+toggleTransparencyButton.Position = UDim2.new(0.5, -100, 0, 90)
+toggleTransparencyButton.Text = "Transparência: 0.9"
+toggleTransparencyButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+toggleTransparencyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleTransparencyButton.Parent = Frame
+
+-- Função para aumentar o tamanho
+increaseSizeButton.MouseButton1Click:Connect(function()
+    HeadSize = HeadSize + 5
+end)
+
+-- Função para diminuir o tamanho
+decreaseSizeButton.MouseButton1Click:Connect(function()
+    HeadSize = math.max(5, HeadSize - 5) -- Impede que o tamanho fique menor que 5
+end)
+
+-- Função para alternar a transparência
+toggleTransparencyButton.MouseButton1Click:Connect(function()
+    if HitboxTransparency == 0.9 then
+        HitboxTransparency = 1
+        toggleTransparencyButton.Text = "Transparência: 1"
+    else
+        HitboxTransparency = 0.9
+        toggleTransparencyButton.Text = "Transparência: 0.9"
+    end
+end)
+
+-- Atualização das hitboxes
+game:GetService('RunService').RenderStepped:Connect(function()
+    local localPlayer = game:GetService('Players').LocalPlayer
+    if not localPlayer then return end
+    
+    for _, player in ipairs(game:GetService('Players'):GetPlayers()) do
+        if player ~= localPlayer then
+            local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if humanoidRootPart then
+                humanoidRootPart.Size = Vector3.new(HeadSize, HeadSize, HeadSize)
+                humanoidRootPart.Transparency = HitboxTransparency
+                humanoidRootPart.BrickColor = BrickColor.new("Really blue")
+                humanoidRootPart.Material = Enum.Material.Neon
+                humanoidRootPart.CanCollide = false
+            end
+        end
+    end
+end)
